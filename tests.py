@@ -35,6 +35,21 @@ class WebTestCase(unittest.TestCase):
 
         return response
 
+    def test_post_yields_method_not_allowed(self):
+        """
+        Sending a POST request should yield a 405 Method Not Allowed response
+        """
+
+        conn = http.client.HTTPConnection('localhost:10000')
+        conn.request('POST', '/')
+
+        response = conn.getresponse()
+
+        conn.close()
+
+        self.assertEqual(response.getcode(), 405)
+
+
     def test_get_sample_text_content(self):
         """
         A call to /sample.txt returns the correct body
@@ -173,6 +188,17 @@ class WebTestCase(unittest.TestCase):
         for path in os.listdir(local_path):
             self.assertIn(path, body, error_comment)
 
+    def test_ok_response_at_root_index(self):
+        """
+        A call to / at least yields a 200 OK response 
+        """
+
+        directory = ''
+        web_path = '/' + directory
+
+        response = self.get_response(web_path)
+
+        self.assertEqual(response.getcode(), 200)
 
 
 if __name__ == '__main__':
