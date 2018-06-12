@@ -9,6 +9,7 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
             b"<html><h1>Welcome:</h1></html>",
             b"text/html"
         ) ->
+
         b'''
         HTTP/1.1 200 OK\r\n
         Content-Type: text/html\r\n
@@ -20,6 +21,12 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
 
 
 def parse_request(request):
+    """
+    Given the content of an HTTP request, returns the uri of that request.
+
+    This server only handles GET requests, so this method shall raise a
+    NotImplementedError if the method of the request is not GET.
+    """
     pass
 
 
