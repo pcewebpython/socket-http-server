@@ -129,7 +129,7 @@ def server(log_buffer=sys.stderr):
                 # use the content and mimetype from response_path to build a 
                 # response_ok.
                 response = response_ok(
-                    content=b"Welcome to my web server",
+                    body=b"Welcome to my web server",
                     mimetype=b"text/plain"
                 )
 
