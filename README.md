@@ -35,6 +35,12 @@ To find the correct mimetype for a file, you might find the following code helpf
     'text/plain'
 ```
 
+## Hints
+
+* Your `response_path` method is going to be looking at the incoming path and checking whether the path represents a directory, a file, or none of the above. There are relevant methods in the [os.path](https://docs.python.org/3/library/os.path.html) module.
+* To complete the assignment, you'll have to get a list of files inside of a directory and then turn that list into a bytestring. There's a method inside of [the os module](https://docs.python.org/3/library/os.html) that can help you address the first part of that problem. You'll then have to turn that list into a string and then a byte-string using techniques you've learned in this class and previous classes.
+* Finally, your `response_path` method will be receiving `path` arguments such as "/a_sample_page.html". Suppose that you are running your server with the command `python http_server.py` from inside the `socket-http-server` directory. Then if you have expressions like `os.path.isfile(path)` in your `response_path` method, these will be looking for a file named "a_sample_page.html" inside of your `socket-http-server` directory. That file **doesn't exist**: the "a_sample_page.html" exists inside of the `webroot` directory. So as you're writing your `response_path` method, you're going to have to somehow modify the `path` variable to make python look for files _inside_ of the `webroot` directory.
+
 ## Use Your Tests
 
 As you work your way through the steps outlined above, look at your tests. Write code that makes them pass.
