@@ -45,3 +45,7 @@ To find the correct mimetype for a file, you might find the following code helpf
 
 As you work your way through the steps outlined above, look at your tests. Write code that makes them pass.
 
+There are integration tests that you can run with `python tests.py` and unit tests that you can run with `python unit-tests.py`. The unit tests test everything except for the server method.
+
+You may find it helpful to work through the homework using either or both sets of tests. If you're not sure how to proceed, it may be easier to begin by running the unit tests and trying to make them pass one at a time.
+
