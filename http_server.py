@@ -1,6 +1,10 @@
 import socket
 import sys
 import traceback
+import os
+import mimetypes
+import glob
+import pdb
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
@@ -21,10 +25,9 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
 
     return b"\r\n".join([
         b"HTTP/1.1 200 OK",
-        b"content-Type: text/palin",
+        b"content-Type: " + mimetype,
         b"",
-        b"Hello hello",
-        b"Hello hello",
+        body
     ])
 
 def response_method_not_allowed():
@@ -33,7 +36,7 @@ def response_method_not_allowed():
     return b"\r\n".join([
         b"HTTP/1.1 405 Method Not Allowed",
         b"",
-        b"You cannot do thos on this server",
+        b"You cannot do this on this server",
     ])
 
 
@@ -41,7 +44,11 @@ def response_not_found():
     """Returns a 404 Not Found response"""
 
     # TODO: Implement response_not_found
-    return b""
+    return b"\r\n".join([
+        b"HTTP/1.1 404 Not Found",
+        b"",
+        b"Requested resource not found",
+    ])
 
 
 def parse_request(request):
@@ -55,7 +62,6 @@ def parse_request(request):
     method, path, version = request.split("\r\n")[0].split(" ")
     if method != "GET":
         raise NotImplementedError
-
     return path
 
 def response_path(path):
@@ -97,11 +103,32 @@ def response_path(path):
     # result of executing `make_time.py`. But you need only return the
     # CONTENTS of `make_time.py`.
     
-    content = b"not implemented"
-    mime_type = b"not implemented"
+    # content = b"not implemented"
+    # mime_type = b"not implemented"
+    url_sub = path.split("/")
+    full_path = os.path.join(os.getcwd(), "webroot", *url_sub)
+    if os.path.isdir(full_path):
+        mime_type = b"text/plain"
+        list_dirs = os.listdir(full_path)
+        content = "\r\n".join(list_dirs).encode()
+        #os.walk(os.path.join(os.getcwd(), "webroot", "images"))
+        # content = "\r\n".join([f for f in glob.glob(
+        #     full_path + "**/", recursive=True)]).encode()
+    elif os.path.isfile(full_path):
+        mime = mimetypes.guess_type(path)[0]
+        mime_type = mime.encode()
+        with open(full_path, "rb") as f:
+            content = f.read()
+    else:
+        raise NameError
 
     return content, mime_type
 
+
+# f for f in glob.glob(path + "**/", recursive=True)
+# for subdir, dirs, files in os.walk(rootdir):
+#     for file in files:
+#         os.path.join(subdir, file)
 
 def server(log_buffer=sys.stderr):
     address = ('127.0.0.1', 10000)
@@ -139,20 +166,27 @@ def server(log_buffer=sys.stderr):
                     # TODO; If parse_request raised a NotImplementedError, then let
                     # response be a method_not_allowed response. If response_path raised
                     # a NameError, then let response be a not_found response. Else,
-                    # use the content and mimetype from response_path to build a 
+                    # use the content and mimetype from response_path to build a
                     # response_ok.
-                    response = response_ok(
-                        body=b"Welcome to my web server",
-                        mimetype=b"text/plain"
-                    )
+                    # response = response_ok(
+                    #     body=b"Welcome to my web server",
+                    #     mimetype=b"text/plain"
+                    # )
                 except NotImplementedError:
                     response = response_method_not_allowed()
-
-                conn.sendall(response)
+                    conn.sendall(response)
+                try:
+                    body, mimetype = response_path(path)
+                    response = response_ok(body, mimetype)
+                    #pdb.set_trace()
+                    conn.sendall(response)
+                except NameError:
+                    response = response_not_found()
+                    conn.sendall(response)
             except:
                 traceback.print_exc()
             finally:
-                conn.close() 
+                conn.close()
 
     except KeyboardInterrupt:
         sock.close()
@@ -164,5 +198,3 @@ def server(log_buffer=sys.stderr):
 if __name__ == '__main__':
     server()
     sys.exit(0)
-
-
