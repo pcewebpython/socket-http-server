@@ -31,13 +31,18 @@ def response_method_not_allowed():
 
     return b"\r\n".join([b"HTTP/1.1 405 Method Not Allowed",
                          b"",
-                         "GET requests only please!"])
+                         b"GET requests only please!"])
 
 
 def response_not_found():
     """Returns a 404 Not Found response"""
 
     return b"HTTP/1.1 404 Not Found"
+
+def response_unknown_error(err_text="unknown"):
+    return b"\r\n".join([b"HTTP/1.1 520 Web Server Returned an Unknown Error",
+                         b"",
+                         b"Error: {}".format(err_text)])
 
 
 def parse_request(request):
@@ -110,16 +115,48 @@ def response_path(path):
         mime_type = mimetypes.guess_type(path)[0]
 
         if mime_type.startswith('text'):
-            with open(path, "r") as f:
-                unencoded_content = f.read()
+            with open(path, "rb") as f:
+                content = f.read()
         else:  # not a text file
             with open(path, "rb") as f:
                 content = f.read()
 
     if unencoded_content:
-        content = unencoded_content.encode('utf8')   
+        content = unencoded_content.encode()   
 
-    return content, mime_type.encode('utf8')
+    return content, mime_type.encode()
+
+
+def process_request(conn, addr):
+    request = ''
+    while True:
+        data = conn.recv(1024)
+        request += data.decode()
+
+        if '\r\n\r\n' in request:
+            break
+
+    print("Request received:\n{}\n\n".format(request))
+
+    return request
+
+
+def generate_response(request):
+    try:
+        path = parse_request(request)
+        print("parse_request returned: {}".format(path))
+
+        content, mimetype = response_path(path)
+
+        response = response_ok(content, mimetype)
+    except NotImplementedError:
+        response = response_method_not_allowed()
+    except NameError:
+        response = response_not_found()
+    except Exception as e:
+        response = response_unknown_error(e)
+    finally:
+        return response
 
 
 def server(log_buffer=sys.stderr):
@@ -134,32 +171,13 @@ def server(log_buffer=sys.stderr):
         while True:
             print('waiting for a connection', file=log_buffer)
             conn, addr = sock.accept()  # blocking
+            print('connection - {0}:{1}'.format(*addr), file=log_buffer)
             try:
-                print('connection - {0}:{1}'.format(*addr), file=log_buffer)
-
-                request = ''
-                while True:
-                    data = conn.recv(1024)
-                    request += data.decode('utf8')
-
-                    if '\r\n\r\n' in request:
-                        break
-
-                print("Request received:\n{}\n\n".format(request))
-
-                try:
-                    path = parse_request(request)
-
-                    content, mimetype = response_path(path)
-
-                    response = response_ok(content, mimetype)
-                except NotImplementedError:
-                    response = response_method_not_allowed()
-                except NameError:
-                    response = response_not_found()
-
+                request = process_request(conn, addr)                
+                response = generate_response(request)
                 conn.sendall(response)
             except:
+                print("in internal exception")
                 traceback.print_exc()
             finally:
                 print("response: {}".format(response))
