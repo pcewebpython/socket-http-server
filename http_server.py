@@ -39,6 +39,7 @@ def response_not_found():
 
     return b"HTTP/1.1 404 Not Found"
 
+
 def response_unknown_error(err_text="unknown"):
     return b"\r\n".join([b"HTTP/1.1 520 Web Server Returned an Unknown Error",
                          b"",
@@ -59,6 +60,7 @@ def parse_request(request):
         raise NotImplementedError
 
     return path
+
 
 def response_path(path):
     """
@@ -165,20 +167,28 @@ def server(log_buffer=sys.stderr):
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print("making a server on {0}:{1}".format(*address), file=log_buffer)
     sock.bind(address)
+    # sock.settimeout(3.0)
     sock.listen(1)
 
     try:
+        response = "Failed to generate response."
         while True:
             print('waiting for a connection', file=log_buffer)
             conn, addr = sock.accept()  # blocking
             print('connection - {0}:{1}'.format(*addr), file=log_buffer)
+            # conn.settimeout(3.0)
             try:
                 request = process_request(conn, addr)                
                 response = generate_response(request)
                 conn.sendall(response)
+            # except socket.timeout:
+            #     print("connection timed out")
+            #     response = response_not_found()
+            #     conn.close()
             except:
                 print("in internal exception")
                 traceback.print_exc()
+                conn.close()
             finally:
                 print("response: {}".format(response))
                 print("connection closing")
@@ -190,10 +200,10 @@ def server(log_buffer=sys.stderr):
         return
     except:
         traceback.print_exc()
+        sock.close()
+        return
 
 
 if __name__ == '__main__':
     server()
     sys.exit(0)
-
-
