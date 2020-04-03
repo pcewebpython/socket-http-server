@@ -1,9 +1,15 @@
+'''
+This module creates a server socket, listens for incoming requests,
+and generates responses to be sent over HTTP.
+'''
+
 import socket
 import sys
 import traceback
 import mimetypes
 import os
 from pathlib import Path
+
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
@@ -28,6 +34,7 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
         b"",
         body
     ])
+
 
 def response_method_not_allowed():
     """Returns a 405 Method Not Allowed response"""
@@ -63,6 +70,7 @@ def parse_request(request):
         raise NotImplementedError
 
     return path
+
 
 def response_path(path):
     """
@@ -107,21 +115,21 @@ def response_path(path):
     if Path(fullpath).is_file():
         filename = fullpath.split('/')[-1:]
         mime_type = mimetypes.guess_type(filename[0])[0].encode()
-        
+
         content = []
-        with open(fullpath,'r+b') as file:
+        with open(fullpath, 'r+b') as file:
             while True:
                 chunk = file.read(16)
                 if not chunk:
                     break
-                else:
-                    content.append(chunk)
+                content.append(chunk)
             content = b''.join(content)
 
     return content, mime_type
 
 
 def server(log_buffer=sys.stderr):
+    '''Create a server socket and accept incoming connections'''
     address = ('127.0.0.1', 10000)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -147,16 +155,16 @@ def server(log_buffer=sys.stderr):
                 print("Request received:\n{}\n\n".format(request))
 
                 try:
-                    # Parse the path from the request and determine the content/mimetype
+                    # Parse the path from the request
                     path = parse_request(request)
                     content, mimetype = response_path(path)
 
                     # If no exceptions occur, create response
                     response = response_ok(content, mimetype)
                 except NotImplementedError:
-                    response = response_method_not_allowed() # 405 Error
+                    response = response_method_not_allowed()  # 405 Error
                 except NameError:
-                    response = response_not_found() # 404 Error
+                    response = response_not_found()  # 404 Error
 
                 # Send response
                 conn.sendall(response)
@@ -164,7 +172,7 @@ def server(log_buffer=sys.stderr):
             except:
                 traceback.print_exc()
             finally:
-                conn.close() 
+                conn.close()
 
     except KeyboardInterrupt:
         sock.close()
@@ -176,5 +184,3 @@ def server(log_buffer=sys.stderr):
 if __name__ == '__main__':
     server()
     sys.exit(0)
-
-
