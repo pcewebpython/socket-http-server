@@ -1,6 +1,15 @@
+'''
+This module creates a server socket, listens for incoming requests,
+and generates responses to be sent over HTTP.
+'''
+
 import socket
 import sys
 import traceback
+import mimetypes
+import os
+from pathlib import Path
+
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
@@ -19,21 +28,32 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
         '''
     """
 
-    # TODO: Implement response_ok
-    return b""
+    return b"\r\n".join([
+        b"HTTP/1.1 200 OK",
+        b"Content-Type: " + mimetype,
+        b"",
+        body
+    ])
+
 
 def response_method_not_allowed():
     """Returns a 405 Method Not Allowed response"""
 
-    # TODO: Implement response_method_not_allowed
-    return b""
+    return b"\r\n".join([
+        b"HTTP/1.1 405 Method Not Allowed",
+        b"",
+        b"You can't do that on this server!"
+    ])
 
 
 def response_not_found():
     """Returns a 404 Not Found response"""
 
-    # TODO: Implement response_not_found
-    return b""
+    return b"\r\n".join([
+        b"HTTP/1.1 404 Not Found",
+        b"",
+        b"The requested resource could not be found."
+    ])
 
 
 def parse_request(request):
@@ -44,8 +64,13 @@ def parse_request(request):
     NotImplementedError if the method of the request is not GET.
     """
 
-    # TODO: implement parse_request
-    return ""
+    method, path, version = request.split("\r\n")[0].split(" ")
+
+    if method != "GET":
+        raise NotImplementedError
+
+    return path
+
 
 def response_path(path):
     """
@@ -74,25 +99,37 @@ def response_path(path):
         response_path('/a_page_that_doesnt_exist.html') -> Raises a NameError
 
     """
+    fullpath = 'webroot' + path
 
-    # TODO: Raise a NameError if the requested content is not present
-    # under webroot.
+    # If path is NOT a file or directory in webroot
+    if not Path(fullpath).is_file() and not Path(fullpath).is_dir():
+        raise NameError
 
-    # TODO: Fill in the appropriate content and mime_type give the path.
-    # See the assignment guidelines for help on "mapping mime-types", though
-    # you might need to create a special case for handling make_time.py
-    #
-    # If the path is "make_time.py", then you may OPTIONALLY return the
-    # result of executing `make_time.py`. But you need only return the
-    # CONTENTS of `make_time.py`.
-    
-    content = b"not implemented"
-    mime_type = b"not implemented"
+    # If the path is a directory in webroot
+    if Path(fullpath).is_dir():
+        mime_type = b'text/plain'
+        filenames = [file.encode() for file in os.listdir(fullpath)]
+        content = b'\n'.join(filenames)
+
+    # If the path is a file in webroot
+    if Path(fullpath).is_file():
+        filename = fullpath.split('/')[-1:]
+        mime_type = mimetypes.guess_type(filename[0])[0].encode()
+
+        content = []
+        with open(fullpath, 'r+b') as file:
+            while True:
+                chunk = file.read(16)
+                if not chunk:
+                    break
+                content.append(chunk)
+            content = b''.join(content)
 
     return content, mime_type
 
 
 def server(log_buffer=sys.stderr):
+    '''Create a server socket and accept incoming connections'''
     address = ('127.0.0.1', 10000)
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -114,30 +151,28 @@ def server(log_buffer=sys.stderr):
 
                     if '\r\n\r\n' in request:
                         break
-		
 
                 print("Request received:\n{}\n\n".format(request))
 
-                # TODO: Use parse_request to retrieve the path from the request.
+                try:
+                    # Parse the path from the request
+                    path = parse_request(request)
+                    content, mimetype = response_path(path)
 
-                # TODO: Use response_path to retrieve the content and the mimetype,
-                # based on the request path.
+                    # If no exceptions occur, create response
+                    response = response_ok(content, mimetype)
+                except NotImplementedError:
+                    response = response_method_not_allowed()  # 405 Error
+                except NameError:
+                    response = response_not_found()  # 404 Error
 
-                # TODO; If parse_request raised a NotImplementedError, then let
-                # response be a method_not_allowed response. If response_path raised
-                # a NameError, then let response be a not_found response. Else,
-                # use the content and mimetype from response_path to build a 
-                # response_ok.
-                response = response_ok(
-                    body=b"Welcome to my web server",
-                    mimetype=b"text/plain"
-                )
-
+                # Send response
                 conn.sendall(response)
+
             except:
                 traceback.print_exc()
             finally:
-                conn.close() 
+                conn.close()
 
     except KeyboardInterrupt:
         sock.close()
@@ -149,5 +184,3 @@ def server(log_buffer=sys.stderr):
 if __name__ == '__main__':
     server()
     sys.exit(0)
-
-
