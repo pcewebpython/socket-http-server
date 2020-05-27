@@ -7,16 +7,16 @@ class TestCase(unittest.TestCase):
 
     def test_response_ok(self):
         mimetype = b"image/bmp"
-        body = b"foo"
+        content = b"foo"
 
-        response = http_server.response_ok(body=body, mimetype=mimetype)
+        response = http_server.response_ok(content=content, mimetype=mimetype)
         str_response = response.decode()
 
         self.assertIn("\r\n\r\n", str_response)
 
-        str_header, str_body = str_response.split("\r\n\r\n")
+        str_header, str_content = str_response.split("\r\n\r\n")
 
-        self.assertEqual(body.decode(), str_body)
+        self.assertEqual(content.decode(), str_content)
         self.assertEqual("HTTP/1.1 200 OK",
                          str_header.splitlines()[0])
         self.assertIn("Content-Type: " + mimetype.decode(), str_header)

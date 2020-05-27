@@ -49,7 +49,6 @@ class WebTestCase(unittest.TestCase):
 
         self.assertEqual(response.getcode(), 405)
 
-
     def test_get_sample_text_content(self):
         """
         A call to /sample.txt returns the correct body
@@ -57,6 +56,7 @@ class WebTestCase(unittest.TestCase):
         file = 'sample.txt'
 
         local_path = os.path.join('webroot', *file.split('/'))
+        # local_path = os.path.join(*file.split('/'))
         web_path = '/' + file
         error_comment = "Error encountered while visiting " + web_path
 
@@ -88,6 +88,7 @@ class WebTestCase(unittest.TestCase):
         file = 'images/Sample_Scene_Balls.jpg'
 
         local_path = os.path.join('webroot', *file.split('/'))
+        # local_path = os.path.join(*file.split('/'))
         web_path = '/' + file
         error_comment = "Error encountered while visiting " + web_path
 
@@ -119,6 +120,7 @@ class WebTestCase(unittest.TestCase):
         file = 'images/sample_1.png'
 
         local_path = os.path.join('webroot', *file.split('/'))
+        # local_path = os.path.join(*file.split('/'))
         web_path = '/' + file
         error_comment = "Error encountered while visiting " + web_path
 
@@ -163,6 +165,7 @@ class WebTestCase(unittest.TestCase):
 
         directory = 'images'
         local_path = os.path.join('webroot', directory)
+        # local_path = os.path.join(directory)
         web_path = '/' + directory
         error_comment = "Error encountered while visiting " + web_path
 
@@ -179,6 +182,7 @@ class WebTestCase(unittest.TestCase):
 
         directory = ''
         local_path = os.path.join('webroot', directory)
+        # local_path = os.path.join(directory)
         web_path = '/' + directory
         error_comment = "Error encountered while visiting " + web_path
 
