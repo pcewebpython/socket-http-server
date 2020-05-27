@@ -10,13 +10,12 @@ import datetime
 
 time_str = datetime.datetime.now().isoformat()
 
-html = """
-<http>
+html = """<!DOCTYPE html>
+<html>
 <body>
 <h2> The time is: </h2>
-<p> %s <p>
+<p> %s </p>
 </body>
-</http>
-""" % time_str
+</html>""" % time_str
 
 print(html)
