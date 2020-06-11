@@ -47,8 +47,9 @@ class WebTestCase(unittest.TestCase):
 
         conn.close()
 
-        self.assertEqual(response.getcode(), 405)
-
+        # both .getcode() and .status can be used to check the response code.
+        self.assertEqual(response.status, 405)
+        #self.assertEqual(response.getcode(), 405)
 
     def test_get_sample_text_content(self):
         """
@@ -64,6 +65,7 @@ class WebTestCase(unittest.TestCase):
 
         self.assertEqual(response.getcode(), 200, error_comment)
 
+        # response.read() will read the http response body.
         with open(local_path, 'rb') as f:
             self.assertEqual(f.read(), response.read(), error_comment)
 
@@ -79,7 +81,9 @@ class WebTestCase(unittest.TestCase):
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200, error_comment)
-        self.assertEqual(response.getheader('Content-Type'), 'text/plain', error_comment)
+        # response.getheader(header_name) will return the value of the header name
+        self.assertEqual(response.getheader('Content-Type'),
+                         'text/plain', error_comment)
 
     def test_get_sample_scene_balls_jpeg(self):
         """
@@ -110,7 +114,8 @@ class WebTestCase(unittest.TestCase):
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200, error_comment)
-        self.assertEqual(response.getheader('Content-Type'), 'image/jpeg', error_comment)
+        self.assertEqual(response.getheader('Content-Type'),
+                         'image/jpeg', error_comment)
 
     def test_get_sample_1_png(self):
         """
@@ -190,7 +195,7 @@ class WebTestCase(unittest.TestCase):
 
     def test_ok_response_at_root_index(self):
         """
-        A call to / at least yields a 200 OK response 
+        A call to / at least yields a 200 OK response
         """
 
         directory = ''
@@ -199,6 +204,24 @@ class WebTestCase(unittest.TestCase):
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200)
+
+    def test_make_time_python_file(self):
+        """
+        A call to wobroot/make_time.py and execute the file and serve up the
+        result of performing that execution.
+        """
+        file = 'make_time.py'
+
+        web_path = '/' + file
+        error_comment = "Error encountered while visiting " + web_path
+
+        response = self.get_response(web_path)
+
+        self.assertEqual(response.getcode(), 200, error_comment)
+        self.assertEqual(response.getheader('Content-Type'),
+                         'text/x-python', error_comment)
+        # HTTPResponse.read() will read the response body in bytestring.
+        self.assertIn('<http>', response.read().decode(), error_comment)
 
 
 if __name__ == '__main__':
