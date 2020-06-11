@@ -100,7 +100,7 @@ def response_path(path):
 
     if os.path.isdir(file_name):
         for file in os.listdir(file_name):
-            content += '{} '.format(file)
+            content += '{}\n'.format(file)
         mime_type = "text/plain"
         return content.encode(), mime_type.encode()
 
