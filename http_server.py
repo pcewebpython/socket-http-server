@@ -90,14 +90,16 @@ def response_path(path):
     """
     home_path = os.getcwd() + "/webroot" + path
 
+    # URI is a directory, then return plain-text listing of the contents and mime_type
     if os.path.isdir(home_path):
-    	mime_type = b"text/plain"
     	content = ('\r\n, '.join(os.listdir(home_path))).encode('utf8')
+    	mime_type = b"text/plain"
 
+    # URI is a file, then return contents of file and mime_type
     elif os.path.isfile(home_path):
-    	mime_type = mimetypes.guess_type(path)[0].encode('utf8')
     	with open(home_path, 'rb') as file:
     		content = file.read()
+    	mime_type = mimetypes.guess_type(path)[0].encode('utf8')
 
     # Raise a NameError if the requested content is not present under webroot.
     else:
