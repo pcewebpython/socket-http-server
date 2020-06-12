@@ -88,18 +88,21 @@ def response_path(path):
         response_path('/a_page_that_doesnt_exist.html') -> Raises a NameError
 
     """
-    # TODO: Fill in the appropriate content and mime_type give the path.
-    # See the assignment guidelines for help on "mapping mime-types"
-    
-    content = b"not implemented"
-    mime_type = b"not implemented"
+    home_path = os.getcwd() + "/webroot" + path
 
-    mime_type = mimetypes.guess_type('file.txt')[0]
-    mime_type = mimetypes.types_map['.txt']
+    if os.path.isdir(home_path):
+    	mime_type = b"text/plain"
+    	content = ('\r\n, '.join(os.listdir(home_path))).encode('utf8')
+
+    elif os.path.isfile(home_path):
+    	mime_type = mimetypes.guess_type(path)[0].encode('utf8')
+    	with open(home_path, 'rb') as file:
+    		content = file.read()
+
     # Raise a NameError if the requested content is not present under webroot.
     else:
-        raise NameError
-    
+    	raise NameError
+
     return content, mime_type
 
 
@@ -133,10 +136,10 @@ def server(log_buffer=sys.stderr):
                     path = parse_request(request)
                     
                     # Use response_path to retrieve the content and mimetype, based on request path
-                    content, mimetype = response_path
+                    content, mime_type = response_path(path)
                     
                     # Use content and mimetype from response_path to build a response_ok
-                    response = response_ok(content, mimetype)
+                    response = response_ok(content, mime_type)
                 
                 # If NotImplementedError, then response is method_not_allowed response
                 except NotImplementedError:
@@ -164,5 +167,3 @@ def server(log_buffer=sys.stderr):
 if __name__ == '__main__':
     server()
     sys.exit(0)
-
-
