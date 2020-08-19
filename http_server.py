@@ -120,10 +120,9 @@ def response_path(path):
             all = original.read()
             try:
                 file_content = "".join(all)
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, TypeError):
                 file_content = all
-            except TypeError:
-                file_content = all
+
 
     else:
         mimetype = "text/plain"
