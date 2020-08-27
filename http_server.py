@@ -98,8 +98,7 @@ def response_path(path):
                 while byte:
                     content += byte
                     byte = reader.read(1)
-            mime_type = mimetypes.guess_type(
-                os.path.normpath(local_path))[0].encode()
+            mime_type = mimetypes.guess_type(local_path)[0].encode()
     else:
         raise NameError
     return content, mime_type
