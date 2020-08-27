@@ -3,6 +3,7 @@ import sys
 import traceback
 import os
 import mimetypes
+import subprocess
 
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
@@ -79,21 +80,24 @@ def response_path(path):
                              b"text/plain")
         response_path('/a_page_that_doesnt_exist.html') -> Raises a NameError
     """
-    local_path = 'webroot' + path
+    temp_path = 'webroot' + path
+    local_path = os.path.normpath(temp_path)
     if os.path.isdir(local_path):
         files = [file_name.encode() for file_name in os.listdir(local_path)]
         content = b'\r\n'.join(files)
         mime_type = b'text/plain'
     elif os.path.isfile(local_path):
-        with open(local_path, 'rb') as reader:
-            content = b''
-            byte = reader.read(1)
-            while byte:
-                content += byte
-                byte = reader.read(1)
-        if local_path == 'webroot/make_time.py':
-            mime_type = b'text/plain'
+        if os.path.basename(local_path) == 'make_time.py':
+            content = subprocess.run(
+                ['python', local_path], capture_output=True).stdout
+            mime_type = b'text/html'
         else:
+            with open(local_path, 'rb') as reader:
+                content = b''
+                byte = reader.read(1)
+                while byte:
+                    content += byte
+                    byte = reader.read(1)
             mime_type = mimetypes.guess_type(
                 os.path.normpath(local_path))[0].encode()
     else:
