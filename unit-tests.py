@@ -5,7 +5,7 @@ import http_server
 
 class TestCase(unittest.TestCase):
 
-    def test_response_ok(self):
+    def xtest_response_ok(self):
         mimetype = b"image/bmp"
         body = b"foo"
 
@@ -21,21 +21,21 @@ class TestCase(unittest.TestCase):
                          str_header.splitlines()[0])
         self.assertIn("Content-Type: " + mimetype.decode(), str_header)
 
-    def test_response_method_not_allowed(self):
+    def xtest_response_method_not_allowed(self):
         response = http_server.response_method_not_allowed()
         str_response = response.decode()
 
         self.assertEqual("HTTP/1.1 405 Method Not Allowed",
                          str_response.splitlines()[0])
 
-    def test_response_not_found(self):
+    def xtest_response_not_found(self):
         response = http_server.response_not_found()
         str_response = response.decode()
 
         self.assertEqual("HTTP/1.1 404 Not Found",
                          str_response.splitlines()[0])
 
-    def test_parse_request_bad_method(self):
+    def xtest_parse_request_bad_method(self):
         request_head = "POST /foo HTTP/1.1"
 
         with self.assertRaises(NotImplementedError):
@@ -47,7 +47,7 @@ class TestCase(unittest.TestCase):
 
         self.assertEqual(path, http_server.parse_request(request_head))
 
-    def test_response_path_file(self):
+    def xtest_response_path_file(self):
         path = "/a_web_page.html"
 
         content, mime_type = http_server.response_path(path)
@@ -57,7 +57,7 @@ class TestCase(unittest.TestCase):
         with open(os.path.join("webroot", "a_web_page.html"), "rb") as f:
             self.assertEqual(f.read(), content)
 
-    def test_response_path_dir(self):
+    def xtest_response_path_dir(self):
         path = "/"
 
         content, mime_type = http_server.response_path(path)
@@ -67,7 +67,7 @@ class TestCase(unittest.TestCase):
         self.assertIn(b"sample.txt", content)
         self.assertIn(b"a_web_page.html", content)
 
-    def test_response_path_not_found(self):
+    def xtest_response_path_not_found(self):
         path = "/foo/bar/baz/doesnt/exist"
 
         with self.assertRaises(NameError):
