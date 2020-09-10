@@ -35,7 +35,7 @@ class WebTestCase(unittest.TestCase):
 
         return response
 
-    def xtest_post_yields_method_not_allowed(self):
+    def test_post_yields_method_not_allowed(self):
         """
         Sending a POST request should yield a 405 Method Not Allowed response
         """
