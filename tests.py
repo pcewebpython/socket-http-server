@@ -35,7 +35,7 @@ class WebTestCase(unittest.TestCase):
 
         return response
 
-    def test_post_yields_method_not_allowed(self):
+    def ZZtest_post_yields_method_not_allowed(self):
         """
         Sending a POST request should yield a 405 Method Not Allowed response
         """
@@ -143,7 +143,7 @@ class WebTestCase(unittest.TestCase):
         self.assertEqual(response.getcode(), 200, error_comment)
         self.assertEqual(response.getheader('Content-Type'), 'image/png', error_comment)
 
-    def xtest_get_404(self):
+    def ZZtest_get_404(self):
         """
         A call to /asdf.txt (a file which does not exist in webroot) yields a 404 error
         """
@@ -153,10 +153,9 @@ class WebTestCase(unittest.TestCase):
         error_comment = "Error encountered while visiting " + web_path
 
         response = self.get_response(web_path)
-
         self.assertEqual(response.getcode(), 404, error_comment)
 
-    def xtest_images_index(self):
+    def ZZtest_images_index(self):
         """
         A call to /images/ yields a list of files in the images directory
         """
@@ -172,7 +171,7 @@ class WebTestCase(unittest.TestCase):
         for path in os.listdir(local_path):
             self.assertIn(path, body, error_comment)
 
-    def xtest_root_index(self):
+    def test_root_index(self):
         """
         A call to / yields a list of files in the images directory
         """
@@ -188,7 +187,7 @@ class WebTestCase(unittest.TestCase):
         for path in os.listdir(local_path):
             self.assertIn(path, body, error_comment)
 
-    def test_ok_response_at_root_index(self):
+    def ZZtest_ok_response_at_root_index(self):
         """
         A call to / at least yields a 200 OK response 
         """
