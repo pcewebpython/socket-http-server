@@ -5,25 +5,6 @@ import os
 import mimetypes
 
 
-def response_ok_AA(body=b"This is a minimal response", mimetype=b"text/plain"):
-    """
-    returns a basic HTTP response
-    """
-
-    # DONE: Implement response_ok
-
-    print("***MMM response_ok, xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    #print("***MMM response_ok, response body =" + str(body))
-
-    
-    return b"\r\n".join([
-        b"HTTP/1.1 200 OK",
-        b"Content-Type: " + mimetype,
-        b"",
-        body
-    ])
-
-
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
     returns a basic HTTP response
@@ -58,7 +39,7 @@ def response_method_not_allowed():
 def response_not_found():
     """Returns a 404 Not Found response"""
 
-    # TODO: Implement response_not_found
+    # DONE: Implement response_not_found
     return b"\r\n".join([
         b"HTTP/1.1 404 Method Not Found",
         b"",
@@ -117,12 +98,10 @@ def response_path(path):
     content = b"not implemented"
     mime_type = b"not implemented"
     
-    # DONE: Raise a NameError if the requested content is not present
-    # under webroot.
-
     print("bbb")
     
     fps = ('webroot\\' + path)
+    print("response_path fps = " + str(fps))
     
     status_isfile = os.path.isfile('webroot\\' + path)
     print("response_path isfile status = " + str(status_isfile))
@@ -134,6 +113,8 @@ def response_path(path):
 
     print("ddd")
 
+    # DONE: Raise a NameError if the requested content is not present
+    # under webroot.
     if ( (status_isfile == False) and (status_isdir == False) ):
         print("raise nameerror")
         raise NameError
@@ -144,17 +125,30 @@ def response_path(path):
         
         print("***MMM resource is a file fps =" + fps)
         
-        f=open(fps, "r")
-        contents =f.read()
-        print("***MMM file contents =" + contents)
-        content=contents.encode('utf-8')
-        
+      
         filename, file_extension = os.path.splitext(fps)
         print(f"***MMM filename={filename}, extenstion={file_extension}")
-        
+
         if (file_extension == ".html"):
+            f=open(fps, "r")
+            contents =f.read()
+            f.close()
+            print("***MMM text file contents =" + str(contents))
+            content=contents.encode('utf-8')
             mime_type=b"text/html"
-            
+        elif (file_extension == ".png"):
+            print("2222222222 binary file read")
+            f=open(fps,"rb")
+            ary_bytes=list(f.read())
+            contents = ""
+            #for ele in ary_bytes:  
+            #    contents += ele 
+            contents = ''.join([str(elem) for elem in ary_bytes])
+            print("***MMM binary file contents =" + str(contents))
+            content=contents.encode('utf-8')
+            f.close()
+            mime_type=b"image/png"
+
     elif (status_isdir):
         ary_files = os.listdir(fps)
         print(f"***MMM list of files in dir {ary_files}")
@@ -165,17 +159,10 @@ def response_path(path):
 
     print("***MMM file content encoded =" + str(content))
         
-        
-    # TODO: Fill in the appropriate content and mime_type give the path.
+    # Done: Fill in the appropriate content and mime_type give the path.
     # See the assignment guidelines for help on "mapping mime-types", though
     # you might need to create a special case for handling make_time.py
-    #
-    # If the path is "make_time.py", then you may OPTIONALLY return the
-    # result of executing `make_time.py`. But you need only return the
-    # CONTENTS of `make_time.py`.
-    
-    #content = b"not implemented"
-    #mime_type = b"not implemented"
+        
 
     return content, mime_type
 
@@ -205,51 +192,55 @@ def server(log_buffer=sys.stderr):
                     if '\r\n\r\n' in request:
                         #print("55555")
                         break
-		
+
                     #print("44444")
 
                 print("Request received:\n{}\n\n".format(request))
 
                 try:
-                    # DONE: Use parse_request to retrieve the path from the request.
-                    path = parse_request(request)
+                
+                    response = None
+                    if (".ico" in request):
+                        pass
+                    else:
+                
+                        # DONE: Use parse_request to retrieve the path from the request.
+                        path = parse_request(request)
 
-                    # DONE: Use response_path to retrieve the content and the mimetype,
-                    # based on the request path.
-                    print("call response_path")
-                    content, mime_type = response_path(path)
+                        # DONE: Use response_path to retrieve the content and the mimetype,
+                        # based on the request path.
+                        print("call response_path")
+                        content, mime_type = response_path(path)
 
-                    #print("***MMM response content encoded =" + str(content))
-                    print("***MMM 1111111111111111111111111")
-                    
-                    # TODO; If parse_request raised a NotImplementedError, then let
-                    # response be a method_not_allowed response. If response_path raised
-                    # a NameError, then let response be a not_found response. Else,
-                    # use the content and mimetype from response_path to build a 
-                    # response_ok.
-                    
-                    #response = response_ok(
-                    #    body=b"Welcome to my web server",
-                    #    mimetype=b"text/plain"
-                    #)
-                    
-                    response = response_ok_AA(content, mime_type)
-                    
-                    print("***MMM ***********************")
-                    #print("88888 response = " + str(response))
+                        #print("***MMM response content encoded =" + str(content))
+                        print("***MMM 1111111111111111111111111")
+                        
+                        
+                        
+                        # DONE: If no exceptions use the content and mimetype from response_path to build a 
+                        # response_ok.
+                        response = response_ok(content, mime_type)
+                        
+                        print("***MMM ***********************")
+                        #print("88888 response = " + str(response))
                     
                 except NameError:
+                    # DONE; If response_path raised
+                    # a NameError, then let response be a not_found response. Else,
                     response = response_not_found()
                 except NotImplementedError:
+                    # Done; If parse_request raised a NotImplementedError, then let
+                    # response be a method_not_allowed response.
                     response = response_method_not_allowed()
-                    
-                conn.sendall(response)
+
+                if (response is not None):
+                    conn.sendall(response)
             except:
                 traceback.print_exc()
             finally:
                 print("***MMM closing connection")
                 conn.close() 
-
+                
     except KeyboardInterrupt:
         sock.close()
         return
