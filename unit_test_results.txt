@@ -1,0 +1,23 @@
+***MMM parse_request path= /foo
+xxxxxxxxxxxxxxxxxxxxxxx sr = HTTP/1.1 404 Method Not Found
+
+You can't do that on this server, 404 error Resource Name Not Found!
+xxxxxxxxxxxxxxxxxxxxxxx sspl = HTTP/1.1 404 Method Not Found
+***MMM response_ok, xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+aaa
+bbb
+response_path fps = webroot\/
+response_path isfile status = False
+ccc
+response_path isdir status = True
+ddd
+***MMM list of files in dir ['a_web_page.html', 'favicon.ico', 'images', 'make_time.py', 'sample.txt']
+***MMM file content encoded =b'a_web_page.html\nfavicon.ico\nimages\nmake_time.py\nsample.txt'
+aaa
+bbb
+response_path fps = webroot\/foo/bar/baz/doesnt/exist
+response_path isfile status = False
+ccc
+response_path isdir status = False
+ddd
+raise nameerror

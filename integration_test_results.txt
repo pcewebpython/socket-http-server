@@ -1,0 +1,16 @@
+test_get_404 (tests.WebTestCase) ... ok
+test_get_sample_1_png (tests.WebTestCase) ... ok
+test_get_sample_1_png_mime_type (tests.WebTestCase) ... ok
+test_get_sample_scene_balls_jpeg (tests.WebTestCase) ... ok
+test_get_sample_scene_balls_jpeg_mime_type (tests.WebTestCase) ... ok
+test_get_sample_text_content (tests.WebTestCase) ... ok
+test_get_sample_text_mime_type (tests.WebTestCase) ... ok
+test_images_index (tests.WebTestCase) ... ok
+test_ok_response_at_root_index (tests.WebTestCase) ... ok
+test_post_yields_method_not_allowed (tests.WebTestCase) ... ok
+test_root_index (tests.WebTestCase) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 11.558s
+
+OK

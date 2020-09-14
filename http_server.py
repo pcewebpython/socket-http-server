@@ -3,7 +3,7 @@ import sys
 import traceback
 import os
 import mimetypes
-
+import base64
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
@@ -12,10 +12,6 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
 
     # DONE: Implement response_ok
 
-    print("***MMM response_ok, xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    #print("***MMM response_ok, response body =" + str(body))
-
-    
     return b"\r\n".join([
         b"HTTP/1.1 200 OK",
         b"Content-Type: " + mimetype,
@@ -41,7 +37,7 @@ def response_not_found():
 
     # DONE: Implement response_not_found
     return b"\r\n".join([
-        b"HTTP/1.1 404 Method Not Found",
+        b"HTTP/1.1 404 Not Found",
         b"",
         b"You can't do that on this server, 404 error Resource Name Not Found!"
     ])
@@ -136,18 +132,48 @@ def response_path(path):
             print("***MMM text file contents =" + str(contents))
             content=contents.encode('utf-8')
             mime_type=b"text/html"
+        elif (file_extension == ".txt"):
+            f=open(fps, "r")
+            contents =f.read()
+            f.close()
+            #print("***MMM text file contents =" + str(contents))
+            content=contents.encode('utf-8')
+            mime_type=b"text/plain"
         elif (file_extension == ".png"):
             print("2222222222 binary file read")
+
             f=open(fps,"rb")
-            ary_bytes=list(f.read())
-            contents = ""
-            #for ele in ary_bytes:  
-            #    contents += ele 
-            contents = ''.join([str(elem) for elem in ary_bytes])
+            #ary_bytes=list(f.read())
+            #contents = ""
+            #contents = ''.join([str(elem) for elem in ary_bytes])
+            ary_bytes = f.read()
+            contents = ary_bytes
             print("***MMM binary file contents =" + str(contents))
-            content=contents.encode('utf-8')
-            f.close()
+            #content=contents.encode('utf-8')
+            content=contents
             mime_type=b"image/png"
+            
+            #contents = base64.b64encode(open(fps, 'rb').read()).decode('utf-8')
+            #content = contents
+            #mime_type=b"image/png;base64"
+
+            #f = open(fps, "rb")
+            #byte = f.read(1)
+            #while byte:
+            #    print(byte)
+            #    byte = f.read(1)
+
+            
+
+            f.close()
+        elif (file_extension == ".jpg"):
+            f=open(fps,"rb")
+            ary_bytes = f.read()
+            contents = ary_bytes
+            #print("***MMM binary file contents =" + str(contents))
+            content=contents
+            mime_type=b"image/jpeg"
+            f.close()
 
     elif (status_isdir):
         ary_files = os.listdir(fps)
