@@ -1,23 +1,13 @@
-***MMM parse_request path= /foo
-xxxxxxxxxxxxxxxxxxxxxxx sr = HTTP/1.1 404 Method Not Found
-
-You can't do that on this server, 404 error Resource Name Not Found!
-xxxxxxxxxxxxxxxxxxxxxxx sspl = HTTP/1.1 404 Method Not Found
-***MMM response_ok, xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-aaa
-bbb
-response_path fps = webroot\/
-response_path isfile status = False
-ccc
-response_path isdir status = True
-ddd
-***MMM list of files in dir ['a_web_page.html', 'favicon.ico', 'images', 'make_time.py', 'sample.txt']
-***MMM file content encoded =b'a_web_page.html\nfavicon.ico\nimages\nmake_time.py\nsample.txt'
-aaa
-bbb
-response_path fps = webroot\/foo/bar/baz/doesnt/exist
-response_path isfile status = False
-ccc
-response_path isdir status = False
-ddd
-raise nameerror
+test_parse_request (unit-tests.TestCase) ... ok
+test_parse_request_bad_method (unit-tests.TestCase) ... ok
+test_response_method_not_allowed (unit-tests.TestCase) ... ok
+test_response_not_found (unit-tests.TestCase) ... ok
+test_response_ok (unit-tests.TestCase) ... ok
+test_response_path_dir (unit-tests.TestCase) ... ok
+test_response_path_file (unit-tests.TestCase) ... ok
+test_response_path_not_found (unit-tests.TestCase) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.002s
+
+OK

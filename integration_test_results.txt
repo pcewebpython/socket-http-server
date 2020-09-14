@@ -11,6 +11,6 @@ test_post_yields_method_not_allowed (tests.WebTestCase) ... ok
 test_root_index (tests.WebTestCase) ... ok
 
 ----------------------------------------------------------------------
-Ran 11 tests in 11.558s
+Ran 11 tests in 11.688s
 
 OK
