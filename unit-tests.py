@@ -51,11 +51,17 @@ class TestCase(unittest.TestCase):
         path = "/a_web_page.html"
 
         content, mime_type = http_server.response_path(path)
+        sr = content.decode('utf8')
+        sr = sr.rstrip("\n")
 
         self.assertEqual(b"text/html", mime_type)
         
-        with open(os.path.join("webroot", "a_web_page.html"), "rb") as f:
-            self.assertEqual(f.read(), content)
+        with open(os.path.join("webroot", "a_web_page.html"), "r") as f:
+            ss = f.read()
+            ss = ss.rstrip("\n")
+            #print(f" xxxxxx -{sr}-")
+            #print(f" yyyyyy -{ss}-")
+            self.assertEqual(sr, ss)
 
     def test_response_path_dir(self):
         path = "/"

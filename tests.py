@@ -61,12 +61,18 @@ class WebTestCase(unittest.TestCase):
         error_comment = "Error encountered while visiting " + web_path
 
         response = self.get_response(web_path)
+        sr = response.read()
+        sr = sr.decode('utf8')
+        sr = sr.rstrip("\n")
 
         self.assertEqual(response.getcode(), 200, error_comment)
 
-        with open(local_path, 'rb') as f:
-            self.assertEqual(f.read(), response.read(), error_comment)
+        with open(local_path, 'r') as f:
+            ss = f.read()
+            ss = ss.rstrip("\n")
+            self.assertEqual(ss, sr, error_comment)
 
+           
     def test_get_sample_text_mime_type(self):
         """
         A call to /sample.txt returns the correct mimetype
@@ -153,7 +159,6 @@ class WebTestCase(unittest.TestCase):
         error_comment = "Error encountered while visiting " + web_path
 
         response = self.get_response(web_path)
-
         self.assertEqual(response.getcode(), 404, error_comment)
 
     def test_images_index(self):
