@@ -39,10 +39,8 @@ class WebTestCase(unittest.TestCase):
         """
         Sending a POST request should yield a 405 Method Not Allowed response
         """
-
         conn = http.client.HTTPConnection('localhost:10000')
         conn.request('POST', '/')
-
         response = conn.getresponse()
 
         conn.close()
