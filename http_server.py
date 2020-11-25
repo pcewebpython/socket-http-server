@@ -115,7 +115,7 @@ def response_path(path):
     elif os.path.isfile(response_path):
         with open(response_path, 'rb') as fr:
             content = fr.read()
-            mime_type = mimetypes.guess_type(path)[0]
+            mime_type = mimetypes.guess_type(path)[0].encode()
 
     return content, mime_type
 
