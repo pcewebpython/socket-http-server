@@ -4,11 +4,13 @@
 import socket
 import sys
 import traceback
+import os
+import mimetypes
 
 
 def response_ok(body=b'This is a minimal response', mimetype=b'text/plain'):
     """
-    returns a basic HTTP response
+    Returns a basic HTTP response
     Ex:
         response_ok(
             b"<html><h1>Welcome:</h1></html>",
@@ -23,11 +25,10 @@ def response_ok(body=b'This is a minimal response', mimetype=b'text/plain'):
         '''
     """
 
-    # TODO: Implement response_ok
     return b'\r\n'.join([
         b'HTTP/1.1 200 OK',
         b'Content-Type: ' + mimetype,
-        b'',
+        b'',  # CRLF to denote end of header
         body,
     ])
 
@@ -35,7 +36,6 @@ def response_ok(body=b'This is a minimal response', mimetype=b'text/plain'):
 def response_method_not_allowed():
     """Returns a 405 Method Not Allowed response"""
 
-    # TODO: Implement response_method_not_allowed
     return b'\r\n'.join([
         b'HTTP/1.1 405 Method Not Allowed',
         b'',
@@ -46,8 +46,11 @@ def response_method_not_allowed():
 def response_not_found():
     """Returns a 404 Not Found response"""
 
-    # TODO: Implement response_not_found
-    return b''
+    return b'\r\n'.join([
+        b'HTTP/1.1 404 Not Found',
+        b'',
+        b'File or directory not found',
+    ])
 
 
 def parse_request(request):
@@ -58,7 +61,6 @@ def parse_request(request):
     NotImplementedError if the method of the request is not GET.
     """
 
-    # TODO: implement parse_request
     method, path, version = request.split('\r\n')[0].split(' ')
 
     if method != 'GET':
@@ -95,19 +97,25 @@ def response_path(path):
 
     """
 
-    # TODO: Raise a NameError if the requested content is not present
-    # under webroot.
+    content = b''
+    mime_type = b''
 
-    # TODO: Fill in the appropriate content and mime_type give the path.
-    # See the assignment guidelines for help on "mapping mime-types", though
-    # you might need to create a special case for handling make_time.py
-    #
-    # If the path is "make_time.py", then you may OPTIONALLY return the
-    # result of executing `make_time.py`. But you need only return the
-    # CONTENTS of `make_time.py`.
+    requested_path = os.path.join(os.getcwd(), 'webroot' + path)
 
-    content = b'not implemented'
-    mime_type = b'not implemented'
+    if os.path.exists(requested_path):
+        if os.path.isfile(requested_path):  # path is a file
+            # print('this is a file')
+            mime_type = mimetypes.guess_type(requested_path)[0].encode()
+            with open(requested_path, 'rb') as f:
+                content = f.read()
+
+        elif os.path.isdir(requested_path):  # path is a directory
+            # print('this is a directory')
+            mime_type = b'text/plain'
+            for item in os.listdir(requested_path):
+                content += item.encode() + b'\r\n'
+    else:
+        raise NameError  # requested content is not present under webroot
 
     return content, mime_type
 
