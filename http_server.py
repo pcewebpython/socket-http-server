@@ -98,7 +98,6 @@ def response_path(path):
     """
 
     requested_path = os.path.join(os.getcwd(), 'webroot' + path)
-    print(requested_path)
 
     if os.path.exists(requested_path):
         if os.path.isfile(requested_path):  # path is a file
@@ -134,6 +133,8 @@ def server(log_buffer=sys.stderr):
                 request = ''
                 while True:
                     data = conn.recv(1024)
+                    if not data:  # break loop if no data received
+                        break
                     request += data.decode('utf8')
 
                     if '\r\n\r\n' in request:
