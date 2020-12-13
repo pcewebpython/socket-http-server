@@ -97,23 +97,19 @@ def response_path(path):
 
     """
 
-    content = b''
-    mime_type = b''
-
     requested_path = os.path.join(os.getcwd(), 'webroot' + path)
+    print(requested_path)
 
     if os.path.exists(requested_path):
         if os.path.isfile(requested_path):  # path is a file
-            # print('this is a file')
             mime_type = mimetypes.guess_type(requested_path)[0].encode()
             with open(requested_path, 'rb') as f:
                 content = f.read()
 
         elif os.path.isdir(requested_path):  # path is a directory
-            # print('this is a directory')
             mime_type = b'text/plain'
-            for item in os.listdir(requested_path):
-                content += item.encode() + b'\r\n'
+            dir_contents = '\r\n'.join(os.listdir(requested_path))
+            content = dir_contents.encode()
     else:
         raise NameError  # requested content is not present under webroot
 
@@ -147,29 +143,18 @@ def server(log_buffer=sys.stderr):
 
                 try:
                     path = parse_request(request)
-
-                    # TODO: Use parse_request to retrieve the path from the request.
-
-                    # TODO: Use response_path to retrieve the content and the mimetype,
-                    # based on the request path.
-
-                    # TODO; If parse_request raised a NotImplementedError, then let
-                    # response be a method_not_allowed response. If response_path raised
-                    # a NameError, then let response be a not_found response. Else,
-                    # use the content and mimetype from response_path to build a 
-                    # response_ok.
-                    response = response_ok(
-                        body=b'Welcome to my web server',
-                        mimetype=b'text/plain'
-                    )
+                    content, mimetype = response_path(path)
+                    response = response_ok(body=content, mimetype=mimetype)
                 except NotImplementedError:
                     response = response_method_not_allowed()
+                except NameError:
+                    response = response_not_found()
 
                 conn.sendall(response)
             except:
                 traceback.print_exc()
             finally:
-                conn.close() 
+                conn.close()
 
     except KeyboardInterrupt:
         sock.close()
