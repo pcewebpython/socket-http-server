@@ -11,7 +11,9 @@ class WebTestCase(unittest.TestCase):
         self.server_process = subprocess.Popen(
             [
                 "python",
-                "http_server.py"
+                "-u",
+                "http_server.py",
+                "10000"
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -25,15 +27,18 @@ class WebTestCase(unittest.TestCase):
         """
         Helper function to get a response from a given url, using http.client
         """
+        try:
+            conn = http.client.HTTPConnection('localhost:10000')
+            conn.request('GET', url)
 
-        conn = http.client.HTTPConnection('localhost:10000')
-        conn.request('GET', url)
+            response = conn.getresponse()
 
-        response = conn.getresponse()
+            conn.close()
 
-        conn.close()
-
-        return response
+            return response
+        except Exception as e:
+            print(e)
+            raise
 
     def test_post_yields_method_not_allowed(self):
         """
