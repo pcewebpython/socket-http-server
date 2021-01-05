@@ -18,16 +18,16 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
         Content-Type: text/html\r\n
         \r\n
         <html><h1>Welcome:</h1></html>\r\n
-    """
-    print(mimetype)
-    print(body)
-    response = f"""HTTP/1.1 200 OK\r
-Content-Type:{mimetype}\r\n\r
-<html><body>{body}</body></html>\r
-"""
-    # response = "HTTP/1.1 200 OK\r\n"
-    # response += "Content-Type:{}\r\n".format(mimetype)
-    # response += "\r\n"
+    # """
+    # response = f"""HTTP/1.1 200 OK\r
+    # Content-Type:{mimetype}\r\n\r
+    # {body}
+    # """
+    response = "HTTP/1.1 200 OK\r\n"
+    response += "Content-Type:{}\r\n".format(mimetype)
+    response += "\r\n"
+    response += "{}".format(body)
+
     # response += "html><body>{}</body></html>\r\n".format(body)
 
     return response.encode()
@@ -117,9 +117,15 @@ def response_path(path):
         mime_type = types.get(extension)
         print(mime_type)
 
-        with open(path, 'rt') as file:
-            content = file.read()
+        if "text" in mime_type:
+            with open(path, 'r', newline="\r\n") as file:
+                content = file.read()
 
+        else:
+            with open(path, 'rb') as file:
+                content = file.read()
+                # print(content)
+         
 
     # TODO: Fill in the appropriate content and mime_type give the path.
     # See the assignment guidelines for help on "mapping mime-types", though
@@ -256,7 +262,7 @@ def server(log_buffer=sys.stderr):
                     body=content,
                     mimetype=mime_type
                 )
-                print(response)
+                # print(response)
                 conn.sendall(response)
             except NotImplementedError:
                 response = response_method_not_allowed()

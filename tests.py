@@ -71,6 +71,13 @@ class WebTestCase(unittest.TestCase):
 
         with open(local_path, 'rb') as f:
             self.assertEqual(f.read(), response.read(), error_comment)
+        #     given = f.read()
+        #     actual = response.read()
+        # print()
+        # print(given)
+        # print(actual)
+
+
 
     def test_get_sample_text_mime_type(self):
         """
@@ -98,11 +105,13 @@ class WebTestCase(unittest.TestCase):
 
         response = self.get_response(web_path)
 
-        self.assertEqual(response.getcode(), 200, error_comment)
+        # self.assertEqual(response.getcode(), 200, error_comment)
 
         with open(local_path, 'rb') as f:
-            self.assertEqual(f.read(), response.read(), error_comment)
-
+            
+            given = f.read()
+            actual = response.read()
+            self.assertEqual(given, actual, error_comment)
     def test_get_sample_scene_balls_jpeg_mime_type(self):
         """
         A call to /images/Sample_Scene_Balls.jpg returns the correct mimetype
