@@ -59,7 +59,7 @@ class WebTestCase(unittest.TestCase):
         """
         A call to /sample.txt returns the correct body
         """
-        file = 'sample.txt'
+        file = 'make_time.py'
 
         local_path = os.path.join('webroot', *file.split('/'))
         web_path = '/' + file

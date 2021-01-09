@@ -2,7 +2,8 @@ import socket
 import sys
 import os
 import traceback
-
+import mimetypes
+import subprocess
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
@@ -23,19 +24,36 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     # Content-Type:{mimetype}\r\n\r
     # {body}
     # """
-    response = "HTTP/1.1 200 OK\r\n"
-    response += "Content-Type:{}\r\n".format(mimetype)
-    response += "\r\n"
-    response += "{}".format(body)
+    if mimetype == "text/plain":
+        response = "HTTP/1.1 200 OK\r\n"
+        response += "Content-Type:{}\r\n".format(mimetype).encode()
+        response += "\r\n"
+        response += "{}".format(body)
+        
+        return response.encode()
 
-    # response += "html><body>{}</body></html>\r\n".format(body)
+    if mimetype == "text/html":
+        response = "HTTP/1.1 200 OK\r\n"
+        response += "Content-Type:{}\r\n".format(mimetype).encode()
+        response += "\r\n"
+        response += body
 
-    return response.encode()
+        return response.encode()
+
+    else:
+        response = ("HTTP/1.1 200 OK\r\n".encode())
+        response +=("Content-Type: {}\r\n".format(mimetype)).encode()
+        response += ("\r\n".encode())
+        response += body 
+
+        return response
+
+    # return response.encode()
 
 def response_method_not_allowed():
     """Returns a 405 Method Not Allowed response"""
 
-    response = f"""HTTP/1.1 405\r
+    response = f"""HTTP/1.1 405 Method Not Allowed\r
 Content-Type: text/plain\r\n\r
 <html><body>Method Not Allowed</body></html>\r"""
     return response.encode()
@@ -44,7 +62,7 @@ Content-Type: text/plain\r\n\r
 def response_not_found():
     """Returns a 404 Not Found response"""
 
-    response = f"""HTTP/1.1 404\r
+    response = f"""HTTP/1.1 404 Not Found\r
                 Content-Type: text/plain\r\n\r
                 <html><body>Not Found</body></html>\r"""
     return response.encode()
@@ -112,20 +130,21 @@ def response_path(path):
         print(content)
 
     if os.path.isfile(path):
-        types = {".jpg": "image/jpeg", ".png": "image/png", ".html": "text/html", ".ico": "image/vnd.microsoft.icon", ".txt" : "text/plain"}
+        types = {".jpg": "image/jpeg", ".png": "image/png", ".html": "text/html", ".ico": "image/vnd.microsoft.icon", ".txt" : "text/plain", ".py" : "text/plain", ".bmp" : "image/bmp" }
         name, extension = os.path.splitext(path)
         mime_type = types.get(extension)
         print(mime_type)
 
-        if "text" in mime_type:
+        if "text/plain" in mime_type:
             with open(path, 'r', newline="\r\n") as file:
                 content = file.read()
-
+        elif "text/html" in mime_type:
+            with open(path, 'rb') as file:
+                content = file.read()
         else:
             with open(path, 'rb') as file:
                 content = file.read()
-                # print(content)
-         
+
 
     # TODO: Fill in the appropriate content and mime_type give the path.
     # See the assignment guidelines for help on "mapping mime-types", though
@@ -139,88 +158,7 @@ def response_path(path):
     # mime_type = b"not implemented"
 
     return content, mime_type
-# except NameError:
-#     response = response_not_found()
-#     # conn.sendall(response)
 
-
-# def server(log_buffer=sys.stderr):
-    # address = ('127.0.0.1', 10000)
-    # sock = socket.socket(socket.AF_INET, 
-    #                      socket.SOCK_STREAM, 
-    #                      socket.IPPROTO_TCP)
-    # sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # permit reuse of local addresses for this socket
-    # print("making a server on {0}:{1}".format(*address), file=log_buffer)
-    # sock.bind(address)
-    # sock.listen(1)
-
-    # try:
-    #     while True:
-    #         print('waiting for a connection', file=log_buffer)
-    #         conn, addr = sock.accept()  # blocking
-    #         try:
-    #             print('connection - {0}:{1}'.format(*addr), file=log_buffer)
-
-    #             request = ''
-    #             while True:
-    #                 data = conn.recv(1024)
-    #                 request += data.decode('utf8')
-
-    #                 if '\r\n\r\n' in request:
-    #                     break
-		
-
-    #             print("Request received:\n{}\n\n".format(request))
-
-
-    #             path = parse_request(request)
-    #             # TODO: Use parse_request to retrieve the path from the request.
-
-    #             content, mime_type = response_path(path)
-    #             # print(content)
-    #             # print(mime_type)
-
-    #             # TODO: Use response_path to retrieve the content and the mimetype,
-    #             # based on the request path.
-    #             # response = response_ok(
-    #             #     body=content,
-    #             #     mimetype=mime_type
-    #             # )
-    #             response = response_ok()
-
-    #             # TODO; If parse_request raised a NotImplementedError, then let
-    #             # response be a method_not_allowed response. If response_path raised
-    #             # a NameError, then let response be a not_found response. Else,
-    #             # use the content and mimetype from response_path to build a 
-    #             # response_ok.
-    #             # response = response_ok(
-    #             #     body=b"Welcome to my web server",
-    #             #     mimetype=b"text/plain"
-    #             # )
-
-
-    #             # response = response_ok(
-    #             #         body=b"Welcome to my web server",
-    #             #         mimetype=b"text/plain"
-    #             #         )
-
-    #             conn.sendall(response)
-
-    #         except NotImplementedError:
-    #             response = response_method_not_allowed()
-    #         except NameError:
-    #             response = response_not_found()
-    #         except:
-    #             traceback.print_exc()
-    #         finally:
-    #             pass
-    #             # conn.close() 
-
-    # except KeyboardInterrupt:
-    #     sock.close()
-    #     return
-    # except:
-    #     traceback.print_exc()
 
 def server(log_buffer=sys.stderr):
     address = ('127.0.0.1', 10000)
@@ -244,8 +182,6 @@ def server(log_buffer=sys.stderr):
 
                     if '\r\n\r\n' in request:
                         break
-		
-
                 print("Request received:\n{}\n\n".format(request))
 
                 # TODO: Use parse_request to retrieve the path from the request.
