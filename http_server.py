@@ -26,31 +26,22 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     # """
     if mimetype == "text/plain":
         response = "HTTP/1.1 200 OK\r\n"
-        response += "Content-Type:{}\r\n".format(mimetype).encode()
+        response += "Content-Type:{}\r\n".format(mimetype)
         response += "\r\n"
         response += "{}".format(body)
         
         return response.encode()
 
-    if mimetype == "text/html":
-        response = "HTTP/1.1 200 OK\r\n"
-        response += "Content-Type:{}\r\n".format(mimetype).encode()
-        response += "\r\n"
-        response += body
-
-        return response.encode()
-
     else:
-        #if not text then only encode the header, the image is already encoded
-        response = ("HTTP/1.1 200 OK\r\n".encode())
-        response +=("Content-Type: {}\r\n".format(mimetype)).encode()
-        response += ("\r\n".encode())
+        response = "HTTP/1.1 200 OK\r\n"
+        response += "Content-Type: {}\r\n".format(mimetype)
+        response += "\r\n"
+        response = response.encode()
         response += body 
 
         return response
 
-    # return response.encode()
-
+ 
 def response_method_not_allowed():
     """Returns a 405 Method Not Allowed response"""
 
@@ -123,25 +114,21 @@ def response_path(path):
 
     if os.path.isdir(path):
         dir_list = os.listdir(path)
-        # dir_byte = "".join([str(elem + ", ") for elem in dir_list]).encode('utf8')
-        print(dir_list)
-        content = ''.join(dir_list).encode()
-        mime_type = b"text/plain"
+        content = '\r\n'.join(dir_list)
+        mime_type = "text/plain"
 
-        print(content)
+        # print(content)
 
     if os.path.isfile(path):
         types = {".jpg": "image/jpeg", ".png": "image/png", ".html": "text/html", ".ico": "image/vnd.microsoft.icon", ".txt" : "text/plain", ".py" : "text/plain", ".bmp" : "image/bmp" }
         name, extension = os.path.splitext(path)
         mime_type = types.get(extension)
-        print(mime_type)
+        # print(mime_type)
 
         if "text/plain" in mime_type:
             with open(path, 'r', newline="\r\n") as file:
                 content = file.read()
-        elif "text/html" in mime_type:
-            with open(path, 'rb') as file:
-                content = file.read()
+
         else:
             with open(path, 'rb') as file:
                 content = file.read()
