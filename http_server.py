@@ -41,6 +41,7 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
         return response.encode()
 
     else:
+        #if not text then only encode the header, the image is already encoded
         response = ("HTTP/1.1 200 OK\r\n".encode())
         response +=("Content-Type: {}\r\n".format(mimetype)).encode()
         response += ("\r\n".encode())
