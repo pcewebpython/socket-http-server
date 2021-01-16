@@ -52,7 +52,7 @@ class TestCase(unittest.TestCase):
 
         content, mime_type = http_server.response_path(path)
 
-        self.assertEqual(b"text/html", mime_type)
+        self.assertEqual("text/html", mime_type)
         
         with open(os.path.join("webroot", "a_web_page.html"), "rb") as f:
             self.assertEqual(f.read(), content)
