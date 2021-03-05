@@ -7,26 +7,27 @@ import os
 class WebTestCase(unittest.TestCase):
     """tests for the echo server and client"""
 
-    def setUp(self):
-        self.server_process = subprocess.Popen(
-            [
-                "python",
-                "http_server.py"
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+    # def setUp(self):
+    #     self.server_process = subprocess.Popen(
+    #         [
+    #             "python",
+    #             "http_server.py"
+    #         ],
+    #         stdout=subprocess.PIPE,
+    #         stderr=subprocess.PIPE,
+    #     )
+    #
+    # def tearDown(self):
+    #     self.server_process.kill()
+    #     self.server_process.communicate()
 
-    def tearDown(self):
-        self.server_process.kill()
-        self.server_process.communicate()
 
     def get_response(self, url):
         """
         Helper function to get a response from a given url, using http.client
         """
 
-        conn = http.client.HTTPConnection('localhost:10000')
+        conn = http.client.HTTPConnection('127.0.0.1', 10000)
         conn.request('GET', url)
 
         response = conn.getresponse()
@@ -40,7 +41,7 @@ class WebTestCase(unittest.TestCase):
         Sending a POST request should yield a 405 Method Not Allowed response
         """
 
-        conn = http.client.HTTPConnection('localhost:10000')
+        conn = http.client.HTTPConnection('127.0.0.1', 10000)
         conn.request('POST', '/')
 
         response = conn.getresponse()
@@ -190,7 +191,7 @@ class WebTestCase(unittest.TestCase):
 
     def test_ok_response_at_root_index(self):
         """
-        A call to / at least yields a 200 OK response 
+        A call to / at least yields a 200 OK response
         """
 
         directory = ''
