@@ -49,7 +49,6 @@ class WebTestCase(unittest.TestCase):
 
         self.assertEqual(response.getcode(), 405)
 
-
     def test_get_sample_text_content(self):
         """
         A call to /sample.txt returns the correct body
@@ -75,6 +74,9 @@ class WebTestCase(unittest.TestCase):
 
         web_path = '/' + file
         error_comment = "Error encountered while visiting " + web_path
+
+        print(web_path)
+        print(os.getcwd())
 
         response = self.get_response(web_path)
 
