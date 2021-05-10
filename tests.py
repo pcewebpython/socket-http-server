@@ -75,9 +75,6 @@ class WebTestCase(unittest.TestCase):
         web_path = '/' + file
         error_comment = "Error encountered while visiting " + web_path
 
-        print(web_path)
-        print(os.getcwd())
-
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200, error_comment)
@@ -201,7 +198,7 @@ class WebTestCase(unittest.TestCase):
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200)
-
+    
 
 if __name__ == '__main__':
     unittest.main()
