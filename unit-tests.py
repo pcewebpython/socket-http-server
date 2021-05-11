@@ -73,6 +73,5 @@ class TestCase(unittest.TestCase):
         with self.assertRaises(NameError):
             http_server.response_path(path)
 
-
 if __name__ == '__main__':
     unittest.main()

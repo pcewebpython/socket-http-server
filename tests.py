@@ -49,7 +49,6 @@ class WebTestCase(unittest.TestCase):
 
         self.assertEqual(response.getcode(), 405)
 
-
     def test_get_sample_text_content(self):
         """
         A call to /sample.txt returns the correct body
@@ -199,7 +198,7 @@ class WebTestCase(unittest.TestCase):
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200)
-
+    
 
 if __name__ == '__main__':
     unittest.main()
